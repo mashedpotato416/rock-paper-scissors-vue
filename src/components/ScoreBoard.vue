@@ -24,10 +24,10 @@
         </thead>
         <tbody>
           <tr v-for="(player, index) in scoreLeaders" :key="index">
-            <td v-if="index === 0" class="text-center">
+            <td v-if="index === 0" class="text-center text-capitalize">
               <font-awesome-icon icon="crown" /> {{ player }}
             </td>
-            <td v-else class="text-center">
+            <td v-else class="text-center text-capitalize">
               {{ player }}
             </td>
             <td>
