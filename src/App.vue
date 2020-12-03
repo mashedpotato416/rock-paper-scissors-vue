@@ -1,8 +1,14 @@
 <template>
   <div>
     <!-- logged out -->
-    <div v-if="userLoggedIn">
-
+    <div 
+      v-if="!userLoggedIn"
+      class="container-fluid"
+      style="height: 100vh; max-width: 480px;">
+      <div class="row justify-content-center my-4">
+      <login
+        @login="login"></login>
+      </div>
     </div>
     <!-- logged In -->
     <div 
@@ -28,7 +34,8 @@
                 <div 
                   class="font-weight-dark text-dark"
                   style="font-size: 0.8em;">
-                  {{ currentUser }}'s Score: {{ currentScore }}
+                  <span class="text-capitalize"> {{ currentUser }}'s </span>
+                  <span> Score: {{ currentScore }} </span>
                 </div>
               </div>
             </div>
@@ -47,22 +54,24 @@
 <script>
 import MainGame from "./components/MainGame.vue"
 import ScoreBoard from "./components/ScoreBoard.vue"
+import Login from "./components/Login.vue"
 
 export default {
   name: 'App',
   components: {
     MainGame,
-    ScoreBoard
+    ScoreBoard,
+    Login
   },
   data() {
     return {
       userLoggedIn: false,
-      currentUser: 'Hector',
+      currentUser: "",
       currentScore: 0,
       scoreDatabase: {
-        Jenny: 1,
-        Jamii: 3,
-        John: 2
+        jenny: 1,
+        jamii: 3,
+        john: 2
       },
     }
   },
@@ -83,12 +92,24 @@ export default {
       // force change in var to recalculate
       this.scoreDatabase = {}
       this.scoreDatabase = container
-      // log user out and reset score
-      this.userLoggedIn = false
+      // reset score
       this.currentScore = 0
+      // logout user after 2 seconds
+      setTimeout( () => { this.userLoggedIn = false }, 2000 )
+    },
+    login (user) {
+      if (user === "") {
+        // if blank set to Anonymous
+        this.currentUser = "Anonymous" 
+      } else {
+        this.currentUser = user.toLowerCase()
+      }
+      // turnOff login page
+      this.userLoggedIn = true
     }
   },
   computed: {
+      // function that gets top three scorers
       scoreLeaders: function () {
         var data = this.scoreDatabase
         var players = Object.keys(data)
