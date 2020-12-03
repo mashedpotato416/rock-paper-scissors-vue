@@ -51,17 +51,17 @@
         <div class="row justify-content-center">
           <!-- moves -->
           <img 
-            src="../assets/rock-left.jpg" 
+            src="../assets/rock-right.jpg" 
             style="height: 90px; width: 90px;"
             ref="imageComputer"
             v-if="computer.rock">
           <img 
-            src="../assets/paper-left.jpg" 
+            src="../assets/paper-right.jpg" 
             style="height: 90px; width: 90px;"
             ref="imageComputer"
             v-if="computer.paper">
           <img 
-            src="../assets/scissors-left.jpg" 
+            src="../assets/scissors-right.jpg" 
             style="height: 90px; width: 90px;"
             ref="imageComputer"
             v-if="computer.scissors">
@@ -108,16 +108,6 @@
           </button>
         </div>
       </div>
-
-      <div class="row justify-content-center">
-        <div class="text-center my-3">
-          <button 
-            class="mx-3 btn btn-secondary"
-            @click="test">
-            Test
-          </button>
-        </div>
-      </div>
     </div>
     <!-- game intro -->
     <div 
@@ -160,6 +150,7 @@
         It's a draw!
       </div>
     </div>
+    <!-- play again? -->
     <div
       class="row justify-content-center my-2" 
       v-if="gameDone">
@@ -224,8 +215,9 @@ export default {
     }
   },
   computed: {
+    // check if the game is still playing or waiting for a move
     gameDone: function () {
-      if (this.gameStatus === "win" || this.gameStatus === "lose" || this.gameStatus === "draw") {
+      if (this.gameStatus === "win" || this.gameStatus === "draw") {
         return true
       } else {
         return false
@@ -287,12 +279,10 @@ export default {
           move = "rock"
           break;
         case 2:
-          move = "rock"
-          // move = "paper"
+          move = "paper"
           break;
         case 3:
-          move = "rock"
-          // move = "scissors"
+          move = "scissors"
           break;
       }
       return move
@@ -346,13 +336,14 @@ export default {
     startCount (value) {
       // change display
       this.gameStatus = "counting"
-      this.introMessage = "Let's Start!"
       // change message
+      this.introMessage = "Let's Start!"
+      // set time of each message
       var introTime = {
         rock: (1/3)*value,
         paper: (2/3)*value,
         scissors: value
-       }
+      }
       var movesArray = Object.keys(introTime)
       movesArray.forEach( (move) => {
         setTimeout(() => {
@@ -360,7 +351,7 @@ export default {
           if (move === 'rock') {
             this.openAnimation = "true"
           }
-          // Caplitalize
+          // Caplitalize and change message
           this.introMessage = move.charAt(0).toUpperCase() + move.slice(1) + "!"
           this.changeDisplayHuman(move)
           this.changeDisplayComputer(move)
@@ -403,9 +394,6 @@ export default {
     },
     onNo () {
       this.$emit('endGame')
-    },
-    test () {
-      
     }
   }
 }
