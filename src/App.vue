@@ -25,8 +25,8 @@
               <!-- high score -->
               <div v-if="true" class="row">
                 <score-board
-                  :scoreDatabase = "scoreDatabase"
-                  :scoreLeaders = "scoreLeaders">
+                  :scoreDatabase="scoreDatabase"
+                  :scoreLeaders="scoreLeaders">
                 </score-board>
               </div>
               <!-- player-score -->
@@ -42,6 +42,7 @@
           </div>
           <!-- rock paper scissors game -->
           <main-game
+            :gameLoading="gameSpinner"
             @win="onWin"
             @endGame="saveAndLogout">
           </main-game>
@@ -69,7 +70,8 @@ export default {
       userLoggedIn: false,
       currentUser: "",
       currentScore: 0,
-      scoreDatabase: {}
+      scoreDatabase: {},
+      gameSpinner: false
     }
   },
   methods: {
@@ -113,7 +115,10 @@ export default {
       // reset score
       this.currentScore = 0
       // logout user after 2 seconds
-      setTimeout( () => { this.userLoggedIn = false }, 2000 )
+      this.gameSpinner = true
+      setTimeout( () => { 
+        this.userLoggedIn = false
+        this.gameSpinner = false }, 2000 )
     },
     login (user) {
       if (user === "") {

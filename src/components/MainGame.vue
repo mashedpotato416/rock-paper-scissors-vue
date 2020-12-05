@@ -189,12 +189,22 @@
         </div>
       </div>
     </div>
+    <div 
+      class="row justify-content-center my-2"
+      v-if="isGameLoading"> 
+      <div class="spinner-border text-dark my-3" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
   </div>
 </template>
 <script>
 
 export default {
   name: "MainGame",
+  props: {
+    gameLoading: { type: Boolean }
+  },
   data() {
     return {
       gameStatus: "waiting",
@@ -222,6 +232,9 @@ export default {
       } else {
         return false
       }
+    },
+    isGameLoading: function () {
+      return this.gameLoading
     }
   },
   methods: {
