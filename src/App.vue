@@ -55,6 +55,7 @@
 import MainGame from "./components/MainGame.vue"
 import ScoreBoard from "./components/ScoreBoard.vue"
 import Login from "./components/Login.vue"
+import firebase from './utilities/firebase.js'
 
 export default {
   name: 'App',
@@ -68,11 +69,7 @@ export default {
       userLoggedIn: false,
       currentUser: "",
       currentScore: 0,
-      scoreDatabase: {
-        jenny: 1,
-        jamii: 3,
-        john: 2
-      },
+      scoreDatabase: {}
     }
   },
   methods: {
@@ -88,8 +85,29 @@ export default {
       } else {
         this.scoreDatabase[this.currentUser] = findExistingRecord > this.currentScore ? findExistingRecord : this.currentScore
       }
-      var container = this.scoreDatabase
+      // send new record to firebase
+      // get value because value will reset before we can record
+      var newScore = this.currentScore
+      var database = firebase.database()
+      database.ref('/scores/').once('value')
+      .then( (snapshot) => {
+        var currentFirebase = snapshot.val()
+        console.log(currentFirebase[this.currentUser] < newScore)
+        // check if old or new
+        var currentUsersInFirebase = Object.keys(currentFirebase)
+        if ( currentUsersInFirebase.includes(this.currentUser) 
+          && currentFirebase[this.currentUser] < newScore) {
+            // old user -> record if higher
+            var updates = {};
+            updates['/scores/' + this.currentUser] = newScore
+            database.ref().update(updates)
+        } else if ( !currentUsersInFirebase.includes(this.currentUser) ) { 
+          // new user -> record
+          database.ref('/scores/' + this.currentUser).set(newScore)
+        }
+      })
       // force change in var to recalculate
+      var container = this.scoreDatabase
       this.scoreDatabase = {}
       this.scoreDatabase = container
       // reset score
@@ -100,7 +118,7 @@ export default {
     login (user) {
       if (user === "") {
         // if blank set to Anonymous
-        this.currentUser = "Anonymous" 
+        this.currentUser = "anonymous" 
       } else {
         this.currentUser = user.toLowerCase()
       }
@@ -119,6 +137,14 @@ export default {
         return topPlayers.slice(0,3)
       }
     },
+  created() {
+    // var data = {}
+    var database = firebase.database()
+    database.ref('/scores/').once('value')
+    .then( (snapshot) => {
+      this.scoreDatabase = snapshot.val()
+    })
+  }
 }
 </script>
 
