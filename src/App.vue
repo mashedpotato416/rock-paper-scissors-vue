@@ -81,25 +81,17 @@ export default {
       // add point
       this.currentScore++
     },
+    // function to toggle loading spinner
     onSpinnerToggle () {
       this.gameSpinner = !this.gameSpinner
     },
-    saveAndLogout () {
-      // get better score and append to name
-      var findExistingRecord = this.scoreDatabase[this.currentUser]
-      if ( findExistingRecord === null ) { 
-        this.scoreDatabase[this.currentUser] = this.currentScore
-      } else {
-        this.scoreDatabase[this.currentUser] = findExistingRecord > this.currentScore ? findExistingRecord : this.currentScore
-      }
+    saveScoreFirebase (score) {
       // send new record to firebase
-      // get value because value will reset before we can record
-      var newScore = this.currentScore
+      var newScore = score
       var database = firebase.database()
       database.ref('/scores/').once('value')
       .then( (snapshot) => {
         var currentFirebase = snapshot.val()
-        console.log(currentFirebase[this.currentUser] < newScore)
         // check if old or new
         var currentUsersInFirebase = Object.keys(currentFirebase)
         if ( currentUsersInFirebase.includes(this.currentUser) 
@@ -113,6 +105,17 @@ export default {
           database.ref('/scores/' + this.currentUser).set(newScore)
         }
       })
+    },
+    saveAndLogout () {
+      // get better score and append to name
+      var findExistingRecord = this.scoreDatabase[this.currentUser]
+      if ( findExistingRecord === null ) { 
+        this.scoreDatabase[this.currentUser] = this.currentScore
+      } else {
+        this.scoreDatabase[this.currentUser] = findExistingRecord > this.currentScore ? findExistingRecord : this.currentScore
+      }
+      // if score is better --> save to firebase
+      this.saveScoreFirebase (this.currentScore)
       // force change in var to recalculate
       var container = this.scoreDatabase
       this.scoreDatabase = {}
@@ -134,7 +137,11 @@ export default {
       }
       // turnOff login page
       this.userLoggedIn = true
-    }
+    },
+    onPlayAgain () {
+    this.saveScoreFirebase(this.currentScore)
+    this.currentScore = 0
+    },
   },
   computed: {
       // function that gets top three scorers
@@ -147,16 +154,13 @@ export default {
         return topPlayers.slice(0,3)
       }
     },
-  created() {
+  created () {
     // var data = {}
     var database = firebase.database()
     database.ref('/scores/').once('value')
     .then( (snapshot) => {
       this.scoreDatabase = snapshot.val()
     })
-  },
-  onPlayAgain() {
-    this.currentScore = 0
   }
 }
 </script>
