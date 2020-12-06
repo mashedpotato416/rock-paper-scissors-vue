@@ -44,6 +44,8 @@
           <main-game
             :gameLoading="gameSpinner"
             @win="onWin"
+            @playAgain="onPlayAgain"
+            @spinnerToggle="onSpinnerToggle"
             @endGame="saveAndLogout">
           </main-game>
         </div>
@@ -78,6 +80,9 @@ export default {
     onWin () {
       // add point
       this.currentScore++
+    },
+    onSpinnerToggle () {
+      this.gameSpinner = !this.gameSpinner
     },
     saveAndLogout () {
       // get better score and append to name
@@ -115,10 +120,10 @@ export default {
       // reset score
       this.currentScore = 0
       // logout user after 2 seconds
-      this.gameSpinner = true
+      this.onSpinnerToggle()
       setTimeout( () => { 
         this.userLoggedIn = false
-        this.gameSpinner = false }, 2000 )
+        this.onSpinnerToggle() }, 2000 )
     },
     login (user) {
       if (user === "") {
@@ -149,6 +154,9 @@ export default {
     .then( (snapshot) => {
       this.scoreDatabase = snapshot.val()
     })
+  },
+  onPlayAgain() {
+    this.currentScore = 0
   }
 }
 </script>

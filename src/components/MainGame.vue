@@ -227,7 +227,7 @@ export default {
   computed: {
     // check if the game is still playing or waiting for a move
     gameDone: function () {
-      if (this.gameStatus === "win" || this.gameStatus === "draw") {
+      if (this.gameStatus === "lose") {
         return true
       } else {
         return false
@@ -371,6 +371,15 @@ export default {
         }, (introTime[move])*1000);
       });
     },
+    // continue game after 2 seconds
+    continueGame () {
+      this.$emit('spinnerToggle')
+      setTimeout(() => {
+        this.openAnimation = false
+        this.gameStatus = "waiting"
+        this.$emit('spinnerToggle')
+      }, 1000);
+    },
     playGame ( move ) {
       // *** You may change the length of timer -- countdownTime **** //
       var countdownTime = 2
@@ -389,20 +398,21 @@ export default {
           case 'win':
             this.gameStatus = "win"
             this.$emit('win')
+            this.continueGame()
             break;
           case 'lose':
             this.gameStatus = "lose"
-            this.$emit('endGame')
             break;
           case 'draw':
             this.gameStatus = "draw"
-            // this.$emit('draw')
+            this.continueGame()
             break;
         }
       }, (countdownTime + 1)*1000);
     },
     onYes () {
       this.openAnimation = false
+      this.$emit('playAgain')
       this.gameStatus = "waiting"
     },
     onNo () {
